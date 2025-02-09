@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #1a1a1a;
+        font-family: Arial, sans-serif;
+        overflow: hidden;
+      }
+
+      .stage {
+        text-align: center;
+        color: white;
+      }
+
+      .start-btn {
+        padding: 15px 30px;
+        font-size: 20px;
+        background: transparent;
+        color: white;
+        border: 2px solid #ff69b4;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .start-btn:hover {
+        background: #ff69b4;
+        transform: scale(1.1);
+      }
+
+      .memory-game {
+        display: none;
+        grid-template-columns: repeat(4, 100px);
+        gap: 10px;
+        perspective: 1000px;
+      }
+
+      .memory-card {
+        height: 100px;
+        background: #ff69b4;
+        border-radius: 10px;
+        cursor: pointer;
+        transform-style: preserve-3d;
+        transition: transform 0.5s;
+      }
+
+      .memory-card.flip {
+        transform: rotateY(180deg);
+      }
+
+      .memory-card .front,
+      .memory-card .back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        border-radius: 10px;
+      }
+
+      .memory-card .front {
+        background: #ff69b4;
+        transform: rotateY(180deg);
+      }
+
+      .memory-card .back {
+        background: linear-gradient(45deg, #ff69b4, #ff1493);
+        content: "❤️";
+      }
+
+      .stars {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .star {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: white;
+        border-radius: 50%;
+      }
+
+      .final-message {
+        display: none;
+        font-size: 2em;
+        text-align: center;
+      }
+
+      .letter {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s;
+      }
+
+      .ring {
+        font-size: 3em;
+        opacity: 0;
+        transition: all 1s;
+        transform: scale(0);
+      }
+
+      .choices {
+        display: none;
+        margin-top: 30px;
+      }
+
+      .choice-btn {
+        padding: 15px 30px;
+        margin: 0 10px;
+        font-size: 18px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .yes-btn {
+        background: #ff69b4;
+        color: white;
+      }
+
+      .no-btn {
+        background: #666;
+        color: white;
+      }
+
+      .no-btn:hover {
+        transform: translateX(100px);
+      }
+
+      .firework {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stars"></div>
+    <div class="stage">
+      <button class="start-btn">
+        Cantuaresm, meu amor, clique para começar uma jornada especial ✨
+      </button>
+
+      <div class="memory-game"></div>
+
+      <div class="final-message">
+        <div class="proposal"></div>
+        <div class="ring">💍</div>
+        <div class="choices">
+          <button class="choice-btn yes-btn">Sim! 💕</button>
+          <button class="choice-btn no-btn">Não</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Criar estrelas no fundo
+      function createStars() {
+        const starsContainer = document.querySelector(".stars");
+        for (let i = 0; i < 200; i++) {
+          const star = document.createElement("div");
+          star.className = "star";
+          star.style.left = `${Math.random() * 100}%`;
+          star.style.top = `${Math.random() * 100}%`;
+          star.style.animation = `twinkle ${Math.random() * 3 + 2}s infinite`;
+          starsContainer.appendChild(star);
+        }
+      }
+
+      // Jogo da memória
+      const memoryPieces = [
+        "Eu",
+        "te",
+        "amo",
+        "❤️",
+        "Quer",
+        "casar",
+        "comigo",
+        "?",
+      ];
+
+      function createMemoryGame() {
+        const game = document.querySelector(".memory-game");
+        const pieces = [...memoryPieces, ...memoryPieces];
+        pieces.sort(() => Math.random() - 0.5);
+
+        pieces.forEach((piece, index) => {
+          const card = document.createElement("div");
+          card.className = "memory-card";
+          card.innerHTML = `
+                    <div class="front">${piece}</div>
+                    <div class="back">❤️</div>
+                `;
+          card.dataset.piece = piece;
+          card.addEventListener("click", flipCard);
+          game.appendChild(card);
+        });
+      }
+
+      let hasFlippedCard = false;
+      let lockBoard = false;
+      let firstCard, secondCard;
+      let matchedPairs = 0;
+
+      function flipCard() {
+        if (lockBoard) return;
+        if (this === firstCard) return;
+
+        this.classList.add("flip");
+
+        if (!hasFlippedCard) {
+          hasFlippedCard = true;
+          firstCard = this;
+          return;
+        }
+
+        secondCard = this;
+        checkForMatch();
+      }
+
+      function checkForMatch() {
+        const isMatch = firstCard.dataset.piece === secondCard.dataset.piece;
+        isMatch ? disableCards() : unflipCards();
+      }
+
+      function disableCards() {
+        firstCard.removeEventListener("click", flipCard);
+        secondCard.removeEventListener("click", flipCard);
+        matchedPairs++;
+
+        if (matchedPairs === memoryPieces.length) {
+          setTimeout(showProposal, 1000);
+        }
+
+        resetBoard();
+      }
+
+      function unflipCards() {
+        lockBoard = true;
+        setTimeout(() => {
+          firstCard.classList.remove("flip");
+          secondCard.classList.remove("flip");
+          resetBoard();
+        }, 1000);
+      }
+
+      function resetBoard() {
+        [hasFlippedCard, lockBoard] = [false, false];
+        [firstCard, secondCard] = [null, null];
+      }
+
+      function showProposal() {
+        document.querySelector(".memory-game").style.display = "none";
+        const finalMessage = document.querySelector(".final-message");
+        finalMessage.style.display = "block";
+
+        const text = "Quer casar comigo?";
+        const proposal = document.querySelector(".proposal");
+
+        text.split("").forEach((letter, i) => {
+          const span = document.createElement("span");
+          span.className = "letter";
+          span.textContent = letter;
+          proposal.appendChild(span);
+
+          setTimeout(() => {
+            span.style.opacity = "1";
+            span.style.transform = "translateY(0)";
+          }, i * 100);
+        });
+
+        setTimeout(() => {
+          document.querySelector(".ring").style.opacity = "1";
+          document.querySelector(".ring").style.transform = "scale(1)";
+        }, text.length * 100);
+
+        setTimeout(() => {
+          document.querySelector(".choices").style.display = "block";
+        }, text.length * 100 + 1000);
+      }
+
+      function createFirework(x, y) {
+        const colors = ["#ff69b4", "#ff1493", "#ff69b4", "#ff1493"];
+
+        for (let i = 0; i < 30; i++) {
+          const firework = document.createElement("div");
+          firework.className = "firework";
+          firework.style.left = `${x}px`;
+          firework.style.top = `${y}px`;
+          firework.style.background =
+            colors[Math.floor(Math.random() * colors.length)];
+
+          const angle = (i * 12 * Math.PI) / 180;
+          const velocity = 10;
+          const vx = Math.cos(angle) * velocity;
+          const vy = Math.sin(angle) * velocity;
+
+          document.body.appendChild(firework);
+
+          let posX = x;
+          let posY = y;
+          let life = 100;
+
+          const animate = () => {
+            if (life <= 0) {
+              firework.remove();
+              return;
+            }
+
+            posX += vx;
+            posY += vy;
+            life -= 1;
+
+            firework.style.left = `${posX}px`;
+            firework.style.top = `${posY}px`;
+            firework.style.opacity = life / 100;
+
+            requestAnimationFrame(animate);
+          };
+
+          animate();
+        }
+      }
+
+      // Inicialização
+      createStars();
+
+      document
+        .querySelector(".start-btn")
+        .addEventListener("click", function () {
+          this.style.display = "none";
+          document.querySelector(".memory-game").style.display = "grid";
+          createMemoryGame();
+        });
+
+      document
+        .querySelector(".yes-btn")
+        .addEventListener("click", function (e) {
+          createFirework(e.pageX, e.pageY);
+          setInterval(() => {
+            createFirework(
+              Math.random() * window.innerWidth,
+              Math.random() * window.innerHeight
+            );
+          }, 300);
+        });
+
+      document
+        .querySelector(".no-btn")
+        .addEventListener("mouseover", function () {
+          const maxX = window.innerWidth - this.offsetWidth;
+          const maxY = window.innerHeight - this.offsetHeight;
+
+          this.style.position = "absolute";
+          this.style.left = Math.random() * maxX + "px";
+          this.style.top = Math.random() * maxY + "px";
+        });
+
+      document.head.insertAdjacentHTML(
+        "beforeend",
+        `
+            <style>
+                @keyframes twinkle {
+                    0%, 100% { opacity: 0; }
+                    50% { opacity: 1; }
+                }
+            </style>
+        `
+      );
+    </script>
+  </body>
+</html>

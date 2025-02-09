@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap");
+
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        background: linear-gradient(135deg, #ffd6e6 0%, #ffecf2 100%);
+        font-family: "Poppins", sans-serif;
+        overflow: hidden;
+      }
+
+      .container {
+        text-align: center;
+        padding: 40px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(255, 64, 129, 0.2);
+        backdrop-filter: blur(8px);
+        max-width: 600px;
+        width: 90%;
+      }
+
+      h1 {
+        font-family: "Dancing Script", cursive;
+        color: #ff4081;
+        margin-bottom: 30px;
+        font-size: 3.5em;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .buttons {
+        display: flex;
+        gap: 30px;
+        margin-top: 30px;
+        justify-content: center;
+      }
+
+      button {
+        padding: 15px 40px;
+        font-size: 1.2em;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Poppins", sans-serif;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      #yesBtn {
+        background: linear-gradient(45deg, #4caf50, #45a049);
+        color: white;
+      }
+
+      #yesBtn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+      }
+
+      #noBtn {
+        background: linear-gradient(45deg, #f44336, #e53935);
+        color: white;
+        position: relative;
+      }
+
+      .celebration {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1000;
+      }
+
+      .heart {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background: linear-gradient(45deg, #ff4081, #ff79b0);
+        transform: rotate(45deg);
+        animation: fall 3s linear forwards;
+      }
+
+      .heart::before,
+      .heart::after {
+        content: "";
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: inherit;
+      }
+
+      .heart::before {
+        left: -10px;
+      }
+
+      .heart::after {
+        top: -10px;
+      }
+
+      @keyframes fall {
+        to {
+          transform: translateY(100vh) rotate(45deg);
+        }
+      }
+
+      .result {
+        display: none;
+        margin-top: 30px;
+        animation: fadeIn 1s ease-in;
+      }
+
+      .result h2 {
+        font-family: "Dancing Script", cursive;
+        color: #ff4081;
+        font-size: 2em;
+        margin-bottom: 20px;
+      }
+
+      .couple-photo {
+        max-width: 300px;
+        border-radius: 15px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        margin-top: 20px;
+        display: none;
+        animation: fadeIn 1s ease-in;
+        transition: transform 0.3s ease;
+      }
+
+      .couple-photo:hover {
+        transform: scale(1.05);
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .floating {
+        animation: floating 3s ease-in-out infinite;
+      }
+
+      @keyframes floating {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+        100% {
+          transform: translateY(0px);
+        }
+      }
+
+      .sparkles {
+        position: absolute;
+        pointer-events: none;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+      }
+
+      .sparkle {
+        position: absolute;
+        background: white;
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        opacity: 0;
+        animation: sparkle 2s linear infinite;
+      }
+
+      @keyframes sparkle {
+        0% {
+          transform: scale(0);
+          opacity: 0;
+        }
+        50% {
+          transform: scale(1);
+          opacity: 0.8;
+        }
+        100% {
+          transform: scale(0);
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sparkles"></div>
+    <div class="container">
+      <h1 class="floating">Quer casar comigo?</h1>
+      <div class="buttons">
+        <button id="yesBtn">Sim <i class="fas fa-heart"></i></button>
+        <button id="noBtn">Não <i class="fas fa-times"></i></button>
+      </div>
+      <div class="result">
+        <h2>💑 Que maravilha! Vamos ser muito felizes juntos! 💑</h2>
+      </div>
+      <img
+        src="/api/placeholder/300/200"
+        alt="Casal feliz"
+        class="couple-photo"
+      />
+    </div>
+    <div class="celebration"></div>
+
+    <script>
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const result = document.querySelector('.result');
+        const photo = document.querySelector('.couple-photo');
+        const celebration = document.querySelector('.celebration');
+        const container = document.querySelector('.container');
+        const sparklesContainer = document.querySelector('.sparkles');
+
+        // Função para obter uma posição aleatória segura
+        function getRandomPosition() {
+            const containerRect = container.getBoundingClientRect();
+            const btnRect = noBtn.getBoundingClientRect();
+            
+            // Definir área segura dentro do container
+            const safeWidth = containerRect.width - btnRect.width;
+            const safeHeight = containerRect.height - btnRect.height;
+            
+            // Calcular posições aleatórias dentro da área segura
+            const x = Math.min(Math.max(0, Math.random() * safeWidth), safeWidth);
+            const y = Math.min(Math.max(0, Math.random() * safeHeight), safeHeight);
+            
+            return { x, y };
+        }
+
+        noBtn.addEventListener('mouseover', () => {
+            const { x, y } = getRandomPosition();
+            
+            // Posicionar o botão relativamente ao container
+            noBtn.style.position = 'absolute';
+            noBtn.style.left = `${x}px`;
+            noBtn.style.top = `${y}px`;
+            
+            // Garantir que o botão fique acima de outros elementos
+            noBtn.style.zIndex = '1000';
+        });
+
+        // [Resto do código permanece igual]
+        yesBtn.addEventListener('click', () => {
+            result.style.display = 'block';
+            photo.style.display = 'block';
+            noBtn.style.display = 'none';
+            yesBtn.style.display = 'none';
+            createHearts();
+        });
+
+        // Criar sparkles iniciais
+        for (let i = 0; i < 50; i++) {
+            createSparkle();
+        }
+
+        function createSparkle() {
+            const sparkle = document.createElement('div');
+            sparkle.classList.add('sparkle');
+            sparkle.style.left = Math.random() * 100 + '%';
+            sparkle.style.top = Math.random() * 100 + '%';
+            sparkle.style.animationDelay = Math.random() * 2 + 's';
+            sparklesContainer.appendChild(sparkle);
+        }
+
+        function createHearts() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.classList.add('heart');
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    celebration.appendChild(heart);
+                    
+                    heart.addEventListener('animationend', () => {
+                        heart.remove();
+                    });
+                }, i * 100);
+            }
+            celebration.style.display = 'block';
+        }
+    </script>
+  </body>
+</html>
