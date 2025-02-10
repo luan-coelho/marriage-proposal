@@ -1,304 +1,395 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-      rel="stylesheet"
-    />
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap");
-
       body {
+        margin: 0;
+        height: 100vh;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
-        height: 100vh;
-        margin: 0;
-        background: linear-gradient(135deg, #ffd6e6 0%, #ffecf2 100%);
-        font-family: "Poppins", sans-serif;
+        background: #1a1a1a;
+        font-family: Arial, sans-serif;
         overflow: hidden;
       }
 
-      .container {
+      .stage {
         text-align: center;
-        padding: 40px;
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 20px;
-        box-shadow: 0 8px 32px rgba(255, 64, 129, 0.2);
-        backdrop-filter: blur(8px);
-        max-width: 600px;
-        width: 90%;
+        color: white;
       }
 
-      h1 {
-        font-family: "Dancing Script", cursive;
-        color: #ff4081;
-        margin-bottom: 30px;
-        font-size: 3.5em;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-      }
-
-      .buttons {
-        display: flex;
-        gap: 30px;
-        margin-top: 30px;
-        justify-content: center;
-      }
-
-      button {
-        padding: 15px 40px;
-        font-size: 1.2em;
-        border: none;
-        border-radius: 50px;
+      .start-btn {
+        padding: 15px 30px;
+        font-size: 20px;
+        background: transparent;
+        color: white;
+        border: 2px solid #c084fc;
+        border-radius: 25px;
         cursor: pointer;
-        transition: all 0.3s ease;
-        font-family: "Poppins", sans-serif;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s;
       }
 
-      #yesBtn {
-        background: linear-gradient(45deg, #4caf50, #45a049);
-        color: white;
+      .start-btn:hover {
+        background: #c084fc;
+        transform: scale(1.1);
       }
 
-      #yesBtn:hover {
-        transform: scale(1.05);
-        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
-      }
-
-      #noBtn {
-        background: linear-gradient(45deg, #f44336, #e53935);
-        color: white;
-        position: relative;
-      }
-
-      .celebration {
+      .memory-game {
         display: none;
+        grid-template-columns: repeat(4, 100px);
+        gap: 10px;
+        perspective: 1000px;
+      }
+
+      .memory-card {
+        height: 100px;
+        background: #c084fc;
+        border-radius: 10px;
+        cursor: pointer;
+        transform-style: preserve-3d;
+        transition: transform 0.5s;
+      }
+
+      .memory-card.flip {
+        transform: rotateY(180deg);
+      }
+
+      .memory-card .front,
+      .memory-card .back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        border-radius: 10px;
+      }
+
+      .memory-card .front {
+        background: #c084fc;
+        transform: rotateY(180deg);
+      }
+
+      .memory-card .back {
+        background: linear-gradient(45deg, #c084fc, #ff1493);
+        content: "❤️";
+      }
+
+      .stars {
         position: fixed;
-        top: 0;
-        left: 0;
         width: 100%;
         height: 100%;
         pointer-events: none;
-        z-index: 1000;
-      }
-
-      .heart {
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        background: linear-gradient(45deg, #ff4081, #ff79b0);
-        transform: rotate(45deg);
-        animation: fall 3s linear forwards;
-      }
-
-      .heart::before,
-      .heart::after {
-        content: "";
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: inherit;
-      }
-
-      .heart::before {
-        left: -10px;
-      }
-
-      .heart::after {
-        top: -10px;
-      }
-
-      @keyframes fall {
-        to {
-          transform: translateY(100vh) rotate(45deg);
-        }
-      }
-
-      .result {
-        display: none;
-        margin-top: 30px;
-        animation: fadeIn 1s ease-in;
-      }
-
-      .result h2 {
-        font-family: "Dancing Script", cursive;
-        color: #ff4081;
-        font-size: 2em;
-        margin-bottom: 20px;
-      }
-
-      .couple-photo {
-        max-width: 300px;
-        border-radius: 15px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        margin-top: 20px;
-        display: none;
-        animation: fadeIn 1s ease-in;
-        transition: transform 0.3s ease;
-      }
-
-      .couple-photo:hover {
-        transform: scale(1.05);
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .floating {
-        animation: floating 3s ease-in-out infinite;
-      }
-
-      @keyframes floating {
-        0% {
-          transform: translateY(0px);
-        }
-        50% {
-          transform: translateY(-10px);
-        }
-        100% {
-          transform: translateY(0px);
-        }
-      }
-
-      .sparkles {
-        position: absolute;
-        pointer-events: none;
-        width: 100%;
-        height: 100%;
         z-index: -1;
       }
 
-      .sparkle {
+      .star {
         position: absolute;
+        width: 2px;
+        height: 2px;
         background: white;
-        width: 3px;
-        height: 3px;
         border-radius: 50%;
-        opacity: 0;
-        animation: sparkle 2s linear infinite;
       }
 
-      @keyframes sparkle {
-        0% {
-          transform: scale(0);
-          opacity: 0;
-        }
-        50% {
-          transform: scale(1);
-          opacity: 0.8;
-        }
-        100% {
-          transform: scale(0);
-          opacity: 0;
-        }
+      .final-message {
+        display: none;
+        font-size: 2em;
+        text-align: center;
+      }
+
+      .letter {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s;
+      }
+
+      .ring {
+        font-size: 3em;
+        opacity: 0;
+        transition: all 1s;
+        transform: scale(0);
+      }
+
+      .choices {
+        display: none;
+        margin-top: 30px;
+      }
+
+      .choice-btn {
+        padding: 15px 30px;
+        margin: 0 10px;
+        font-size: 18px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .yes-btn {
+        background: #c084fc;
+        color: white;
+      }
+
+      .no-btn {
+        background: #666;
+        color: white;
+      }
+
+      .no-btn:hover {
+        transform: translateX(100px);
+      }
+
+      .firework {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        pointer-events: none;
       }
     </style>
   </head>
   <body>
-    <div class="sparkles"></div>
-    <div class="container">
-      <h1 class="floating">Quer casar comigo?</h1>
-      <div class="buttons">
-        <button id="yesBtn">Sim <i class="fas fa-heart"></i></button>
-        <button id="noBtn">Não <i class="fas fa-times"></i></button>
+    <div class="stars"></div>
+    <div class="stage">
+      <button class="start-btn">
+        Ester Cantuares, um segredo especial te espera... Clique para descobrir! ✨
+      </button>
+
+      <div class="memory-game"></div>
+
+      <div class="final-message">
+        <div class="proposal"></div>
+        <div class="ring">💍</div>
+        <div class="choices">
+          <button class="choice-btn yes-btn">Sim! 💕</button>
+          <button class="choice-btn no-btn">Não</button>
+        </div>
       </div>
-      <div class="result">
-        <h2>💑 Que maravilha! Vamos ser muito felizes juntos! 💑</h2>
-      </div>
-      <img
-        src="/api/placeholder/300/200"
-        alt="Casal feliz"
-        class="couple-photo"
-      />
     </div>
-    <div class="celebration"></div>
 
     <script>
-        const noBtn = document.getElementById('noBtn');
-        const yesBtn = document.getElementById('yesBtn');
-        const result = document.querySelector('.result');
-        const photo = document.querySelector('.couple-photo');
-        const celebration = document.querySelector('.celebration');
-        const container = document.querySelector('.container');
-        const sparklesContainer = document.querySelector('.sparkles');
+      // Criar estrelas no fundo
+      function createStars() {
+        const starsContainer = document.querySelector(".stars");
+        for (let i = 0; i < 200; i++) {
+          const star = document.createElement("div");
+          star.className = "star";
+          star.style.left = `${Math.random() * 100}%`;
+          star.style.top = `${Math.random() * 100}%`;
+          star.style.animation = `twinkle ${Math.random() * 3 + 2}s infinite`;
+          starsContainer.appendChild(star);
+        }
+      }
 
-        // Função para obter uma posição aleatória segura
-        function getRandomPosition() {
-            const containerRect = container.getBoundingClientRect();
-            const btnRect = noBtn.getBoundingClientRect();
-            
-            // Definir área segura dentro do container
-            const safeWidth = containerRect.width - btnRect.width;
-            const safeHeight = containerRect.height - btnRect.height;
-            
-            // Calcular posições aleatórias dentro da área segura
-            const x = Math.min(Math.max(0, Math.random() * safeWidth), safeWidth);
-            const y = Math.min(Math.max(0, Math.random() * safeHeight), safeHeight);
-            
-            return { x, y };
+      // Jogo da memória
+      const memoryPieces = [
+        "Eu",
+        "te",
+        "amo",
+        "❤️",
+        "Quer",
+        "casar",
+        "comigo",
+        "?",
+      ];
+
+      function createMemoryGame() {
+        const game = document.querySelector(".memory-game");
+        const pieces = [...memoryPieces, ...memoryPieces];
+        pieces.sort(() => Math.random() - 0.5);
+
+        pieces.forEach((piece, index) => {
+          const card = document.createElement("div");
+          card.className = "memory-card";
+          card.innerHTML = `
+                    <div class="front">${piece}</div>
+                    <div class="back">❤️</div>
+                `;
+          card.dataset.piece = piece;
+          card.addEventListener("click", flipCard);
+          game.appendChild(card);
+        });
+      }
+
+      let hasFlippedCard = false;
+      let lockBoard = false;
+      let firstCard, secondCard;
+      let matchedPairs = 0;
+
+      function flipCard() {
+        if (lockBoard) return;
+        if (this === firstCard) return;
+
+        this.classList.add("flip");
+
+        if (!hasFlippedCard) {
+          hasFlippedCard = true;
+          firstCard = this;
+          return;
         }
 
-        noBtn.addEventListener('mouseover', () => {
-            const { x, y } = getRandomPosition();
-            
-            // Posicionar o botão relativamente ao container
-            noBtn.style.position = 'absolute';
-            noBtn.style.left = `${x}px`;
-            noBtn.style.top = `${y}px`;
-            
-            // Garantir que o botão fique acima de outros elementos
-            noBtn.style.zIndex = '1000';
+        secondCard = this;
+        checkForMatch();
+      }
+
+      function checkForMatch() {
+        const isMatch = firstCard.dataset.piece === secondCard.dataset.piece;
+        isMatch ? disableCards() : unflipCards();
+      }
+
+      function disableCards() {
+        firstCard.removeEventListener("click", flipCard);
+        secondCard.removeEventListener("click", flipCard);
+        matchedPairs++;
+
+        if (matchedPairs === memoryPieces.length) {
+          setTimeout(showProposal, 1000);
+        }
+
+        resetBoard();
+      }
+
+      function unflipCards() {
+        lockBoard = true;
+        setTimeout(() => {
+          firstCard.classList.remove("flip");
+          secondCard.classList.remove("flip");
+          resetBoard();
+        }, 1000);
+      }
+
+      function resetBoard() {
+        [hasFlippedCard, lockBoard] = [false, false];
+        [firstCard, secondCard] = [null, null];
+      }
+
+      function showProposal() {
+        document.querySelector(".memory-game").style.display = "none";
+        const finalMessage = document.querySelector(".final-message");
+        finalMessage.style.display = "block";
+
+        const text = "Quer Casar Comigo?"; // Texto ajustado
+        const proposal = document.querySelector(".proposal");
+
+        text.split("").forEach((letter, i) => {
+          const span = document.createElement("span");
+          span.className = "letter";
+          span.textContent = letter;
+
+          // Adiciona espaço extra após palavras específicas
+          if (letter === "r" || letter === "r") {
+            span.style.marginRight = "10px";
+          }
+
+          proposal.appendChild(span);
+
+          setTimeout(() => {
+            span.style.opacity = "1";
+            span.style.transform = "translateY(0)";
+          }, i * 100);
         });
 
-        // [Resto do código permanece igual]
-        yesBtn.addEventListener('click', () => {
-            result.style.display = 'block';
-            photo.style.display = 'block';
-            noBtn.style.display = 'none';
-            yesBtn.style.display = 'none';
-            createHearts();
-        });
+        setTimeout(() => {
+          document.querySelector(".ring").style.opacity = "1";
+          document.querySelector(".ring").style.transform = "scale(1)";
+        }, text.length * 100);
 
-        // Criar sparkles iniciais
-        for (let i = 0; i < 50; i++) {
-            createSparkle();
-        }
+        setTimeout(() => {
+          document.querySelector(".choices").style.display = "block";
+        }, text.length * 100 + 1000);
+      }
 
-        function createSparkle() {
-            const sparkle = document.createElement('div');
-            sparkle.classList.add('sparkle');
-            sparkle.style.left = Math.random() * 100 + '%';
-            sparkle.style.top = Math.random() * 100 + '%';
-            sparkle.style.animationDelay = Math.random() * 2 + 's';
-            sparklesContainer.appendChild(sparkle);
-        }
+      function createFirework(x, y) {
+        const colors = ["#c084fc", "#a855f7", "#9333ea", "#7e22ce"];
 
-        function createHearts() {
-            for (let i = 0; i < 50; i++) {
-                setTimeout(() => {
-                    const heart = document.createElement('div');
-                    heart.classList.add('heart');
-                    heart.style.left = Math.random() * 100 + 'vw';
-                    celebration.appendChild(heart);
-                    
-                    heart.addEventListener('animationend', () => {
-                        heart.remove();
-                    });
-                }, i * 100);
+        for (let i = 0; i < 30; i++) {
+          const firework = document.createElement("div");
+          firework.className = "firework";
+          firework.style.left = `${x}px`;
+          firework.style.top = `${y}px`;
+          firework.style.background =
+            colors[Math.floor(Math.random() * colors.length)];
+
+          const angle = (i * 12 * Math.PI) / 180;
+          const velocity = 10;
+          const vx = Math.cos(angle) * velocity;
+          const vy = Math.sin(angle) * velocity;
+
+          document.body.appendChild(firework);
+
+          let posX = x;
+          let posY = y;
+          let life = 100;
+
+          const animate = () => {
+            if (life <= 0) {
+              firework.remove();
+              return;
             }
-            celebration.style.display = 'block';
+
+            posX += vx;
+            posY += vy;
+            life -= 1;
+
+            firework.style.left = `${posX}px`;
+            firework.style.top = `${posY}px`;
+            firework.style.opacity = life / 100;
+
+            requestAnimationFrame(animate);
+          };
+
+          animate();
         }
+      }
+
+      // Inicialização
+      createStars();
+
+      document
+        .querySelector(".start-btn")
+        .addEventListener("click", function () {
+          this.style.display = "none";
+          document.querySelector(".memory-game").style.display = "grid";
+          createMemoryGame();
+        });
+
+      document
+        .querySelector(".yes-btn")
+        .addEventListener("click", function (e) {
+          createFirework(e.pageX, e.pageY);
+          setInterval(() => {
+            createFirework(
+              Math.random() * window.innerWidth,
+              Math.random() * window.innerHeight
+            );
+          }, 300);
+        });
+
+      document
+        .querySelector(".no-btn")
+        .addEventListener("mouseover", function () {
+          const maxX = window.innerWidth - this.offsetWidth;
+          const maxY = window.innerHeight - this.offsetHeight;
+
+          this.style.position = "absolute";
+          this.style.left = Math.random() * maxX + "px";
+          this.style.top = Math.random() * maxY + "px";
+        });
+
+      document.head.insertAdjacentHTML(
+        "beforeend",
+        `
+            <style>
+                @keyframes twinkle {
+                    0%, 100% { opacity: 0; }
+                    50% { opacity: 1; }
+                }
+            </style>
+        `
+      );
     </script>
   </body>
 </html>
